@@ -87,6 +87,8 @@ TEST_SUITE("Test 2 - Check Iterators") {
     CHECK(*it == 10);
     ++it;
     CHECK(*it == 20);
+    mc.removeElement(10);
+    CHECK(mc.size() == 4);
     }
     TEST_CASE("Prime"){
     MagicalContainer mc;
@@ -106,17 +108,6 @@ TEST_SUITE("Test 2 - Check Iterators") {
     mc.addElement(11);
     ++it;
     CHECK(*it == 11);
-    // MagicalContainer::PrimeIterator primeIter2(mc);
-    // auto it2 = primeIter2.end();
-    // CHECK((*it2) == 13);
-    // std::cout << "Prime numbers:\n";
-    
-    for (auto it = primeIter.begin(); it != primeIter.end(); ++it) {
-        std::cout << *it << ' ';  // 2 3 17 
-    }
-    std::cout << std::endl;
-  
-
     }
 }
 }
