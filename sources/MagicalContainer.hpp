@@ -61,6 +61,7 @@ namespace ariel
         void arrangeSideCross(MagicalContainer &container);
         int operator*() const;
         SideCrossIterator &operator++();
+        void print();
         bool operator==(const SideCrossIterator &other) const;
         bool operator!=(const SideCrossIterator &other) const;
         bool operator>(const SideCrossIterator &other) const;

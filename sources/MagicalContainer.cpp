@@ -17,11 +17,14 @@ namespace ariel
         {
             throw("cannot remove");
         }
-        for (auto it = elements_vector.begin(); it != elements_vector.end(); ++it)
+        for (auto it = elements_vector.begin(); it <= elements_vector.end(); ++it)
         {
+
             if (*it == element)
             {
                 elements_vector.erase(it);
+                std::cout << "erased " << std::to_string(*it) << std::endl;
+                ;
                 return;
             }
         }
@@ -99,6 +102,10 @@ namespace ariel
 
     MagicalContainer::AscendingIterator MagicalContainer::AscendingIterator::begin()
     {
+        if(iterator_container.size() == 0)
+        {
+            throw("cannot get in the container");
+        }
         return AscendingIterator(iterator_container, 0);
     }
 
@@ -123,40 +130,45 @@ namespace ariel
           isFront(other.isFront) {}
     // Destructor
     MagicalContainer::SideCrossIterator::~SideCrossIterator() {}
-    
-    //This function takes the container of the iterator and arrange it's element by the proper order
+
+    // This function takes the container of the iterator and arrange it's element by the proper order
     void MagicalContainer::SideCrossIterator::arrangeSideCross(MagicalContainer &container)
     {
         std::vector<int> arrangedElements;
         size_t startIndex = 0;
-        size_t endIndex = container.size() - 1;
+        size_t endIndex = container.size();
 
         // Alternate between taking elements from the front and back
         bool isFront = true;
-
-        while (startIndex <= endIndex)
+        int i = 0;
+        while (startIndex < endIndex)
         {
+            // std ::cout << i << std::endl;
+            i++;
             if (isFront)
             {
                 arrangedElements.push_back(container.elements_vector[startIndex]);
+                // std ::cout << container.elements_vector[startIndex] << std::endl;
                 startIndex++;
             }
             else
             {
-                arrangedElements.push_back(container.elements_vector[endIndex]);
+                arrangedElements.push_back(container.elements_vector[endIndex - 1]);
+                // std ::cout << container.elements_vector[endIndex -1] << std::endl;
                 endIndex--;
             }
 
             isFront = !isFront;
         }
-
-        // Update the container's elements with the arranged order
+        // container.removeElement(container.elements_vector[endIndex -1]);
+        //  Update the container's elements with the arranged order
         container.elements_vector = std::move(arrangedElements);
 
         // Update the iterator's indices
         this->startIndex = 0;
-        this->endIndex = container.size() - 1;
+        this->endIndex = container.size();
     }
+
     MagicalContainer::SideCrossIterator &ariel::MagicalContainer::SideCrossIterator::operator=(const SideCrossIterator &other)
     {
         if (this != &other)
@@ -195,6 +207,11 @@ namespace ariel
 
     bool MagicalContainer::SideCrossIterator::operator==(const SideCrossIterator &other) const
     {
+        // std::cout << "front: " << std::to_string(startIndex) << std::endl;
+        // std::cout << "front other: " << std::to_string(other.startIndex) << std::endl;
+        // std::cout << "back: " << std::to_string(endIndex) << std::endl;
+        // std::cout << "back other: " << std::to_string(other.endIndex) << std::endl;
+
         return (startIndex == other.startIndex) && (endIndex == other.endIndex);
     }
 
@@ -215,12 +232,16 @@ namespace ariel
 
     MagicalContainer::SideCrossIterator MagicalContainer::SideCrossIterator::begin()
     {
-        return SideCrossIterator(iterator_container, 0, iterator_container.size() - 1, true);
+        if(iterator_container.size() == 0)
+        {
+            throw("cannot get in the container");
+        }
+        return SideCrossIterator(iterator_container, 0, iterator_container.size(), true);
     }
 
     MagicalContainer::SideCrossIterator MagicalContainer::SideCrossIterator::end()
     {
-        return SideCrossIterator(iterator_container, iterator_container.size() - 1, iterator_container.size() - 1, false);
+        return SideCrossIterator(iterator_container, iterator_container.size(), iterator_container.size(), false);
     }
 
     // ------------------------------------------------PrimesIterator functions--------------------------------------------------
@@ -246,7 +267,7 @@ namespace ariel
 
     MagicalContainer::PrimeIterator::PrimeIterator(const MagicalContainer &container)
         : iterator_container(container), currentIndex(0) {}
-    
+
     // Destructor
     MagicalContainer::PrimeIterator::~PrimeIterator() {}
 
@@ -261,7 +282,7 @@ namespace ariel
         }
         return true;
     }
-    
+
     int MagicalContainer::PrimeIterator::operator*() const
     {
         return iterator_container.elements_vector[currentIndex];
@@ -303,6 +324,10 @@ namespace ariel
 
     MagicalContainer::PrimeIterator MagicalContainer::PrimeIterator::begin()
     {
+        if(iterator_container.size() == 0)
+        {
+            throw("cannot get in the container");
+        }
         size_t currentIndex = 0;
         while (currentIndex < iterator_container.size() && !isPrime(iterator_container.elements_vector[currentIndex]))
             ++currentIndex;

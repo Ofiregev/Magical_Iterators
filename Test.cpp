@@ -119,5 +119,34 @@ TEST_SUITE("Test 1 - container checks")
             ++it;
             CHECK(*it == 11);
         }
+        TEST_CASE("One element only in the container")
+        {
+            MagicalContainer mc;
+            mc.addElement(2);
+            MagicalContainer::AscendingIterator ascIter(mc);
+            for (auto it = ascIter.begin(); it != ascIter.end(); ++it)
+            {
+                CHECK((*it) == 2);
+            }
+        }
+        TEST_CASE("Changing container and iterator check")
+        {
+            MagicalContainer mc;
+            mc.addElement(1);
+            MagicalContainer::AscendingIterator ascIter(mc);
+            for (auto it = ascIter.begin(); it != ascIter.end(); ++it)
+            {
+                CHECK((*it) == 1);
+            }
+            mc.removeElement(1);
+            CHECK(mc.size() == 0);
+            CHECK_THROWS(ascIter.begin());
+            mc.addElement(2);
+            CHECK(mc.size() == 1);
+            for (auto it = ascIter.begin(); it != ascIter.end(); ++it)
+            {
+                CHECK((*it) == 2);
+            }
+        }
     }
 }
