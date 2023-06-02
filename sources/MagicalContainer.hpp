@@ -8,11 +8,15 @@ namespace ariel
     {
     private:
         std::vector<int> elements_vector;
+        bool assignd_to = false;
 
     public:
+    MagicalContainer ();
         void addElement(int element);
         void removeElement(int element);
         size_t size() const;
+        void assignd(bool something);
+        
 
         class AscendingIterator;
         class SideCrossIterator;
@@ -22,7 +26,7 @@ namespace ariel
     class MagicalContainer::AscendingIterator
     {
     private:
-        MagicalContainer &iterator_container;
+        MagicalContainer iterator_container;
         size_t currentIndex;
 
     public:
@@ -47,6 +51,7 @@ namespace ariel
     {
     private:
         MagicalContainer &iterator_container;
+        size_t currentIndex;
         size_t startIndex;
         size_t endIndex;
         bool isFront;
