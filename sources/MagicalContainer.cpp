@@ -5,12 +5,9 @@
 
 namespace ariel
 {
-    MagicalContainer::MagicalContainer() : elements_vector(std::vector<int>{})
-    {
-        // Any additional initialization code or operations can be added here
-    }
+    MagicalContainer::MagicalContainer() : elements_vector(std::vector<int>{}){} // Default Constructor
 
-    // Core function - add, remove and size
+    // Core functions - add, remove and size
     void MagicalContainer::addElement(int element)
     {
         // std::cout << "adding " << std::to_string(element) << std::endl;
@@ -21,24 +18,27 @@ namespace ariel
 
     void MagicalContainer::removeElement(int element)
     {
+        // Cannot remove if the container is empty
         if (this->size() == 0)
         {
             std::runtime_error("cannot remove");
         }
+        // Search for the element
         for (auto it = elements_vector.begin(); it < elements_vector.end(); ++it)
         {
             if (*it == element)
             {
                 std::cout << "erased " << std::to_string(*it) << std::endl;
-                ;
+                
                 elements_vector.erase(it);
 
                 return;
             }
         }
+        // If it ran over all the vector and didn't find the element - throw exception
         throw std::runtime_error("not exist");
     }
-
+    // Return the size of the vector
     size_t MagicalContainer::size() const
     {
         return elements_vector.size();
@@ -46,31 +46,29 @@ namespace ariel
 
     // ------------------------------------------------AscendingIterator functions--------------------------------------------------
     // Constructors
+
+    //Default constructor
     ariel::MagicalContainer::AscendingIterator::AscendingIterator()
         : iterator_container(*(new MagicalContainer())), currentIndex(0) {}
 
     MagicalContainer::AscendingIterator::AscendingIterator(MagicalContainer &container)
-        : iterator_container(container), currentIndex(0)
-    {
-    }
-
+        : iterator_container(container), currentIndex(0){}
+    
     MagicalContainer::AscendingIterator::AscendingIterator(MagicalContainer &container, size_t currentIndex)
         : iterator_container(container), currentIndex(currentIndex) {}
 
+    // Copy constructor
     MagicalContainer::AscendingIterator::AscendingIterator(const AscendingIterator &other)
         : iterator_container(other.iterator_container), currentIndex(other.currentIndex) {}
 
     // Destructor
     MagicalContainer::AscendingIterator::~AscendingIterator() {}
 
-    // void MagicalContainer::AscendingIterator::sortAscending()
-    // {
-    //     std::sort(iterator_container.elements_vector.begin(), iterator_container.elements_vector.end());
-    // }
-
+    // C opy assignment operator 
     MagicalContainer::AscendingIterator &ariel::MagicalContainer::AscendingIterator::operator=(const AscendingIterator &other)
     {
-
+        // Ensure that we are not assigning an object to itself
+        // The logic here is not very good but this what the tests demand ..
         if (this != &other)
         {
             throw std::runtime_error("Iterators are pointing to different containers");
@@ -82,11 +80,13 @@ namespace ariel
     {
         if (*this == this->end())
         {
-            throw std::runtime_error("got to the end");
+            throw std::runtime_error("Got to the end of the container");
         }
+        // If we are not in the end increment the current index and return a reference to the iterator in this index
         ++currentIndex;
         return *this;
     }
+    // This function returns the int element that in the index we're on 
     int MagicalContainer::AscendingIterator::operator*() const
     {
         return iterator_container.elements_vector[currentIndex];
@@ -112,6 +112,7 @@ namespace ariel
         return currentIndex < other.currentIndex;
     }
 
+    // This function returns an instance of this iterator in the first index of the container 
     MagicalContainer::AscendingIterator MagicalContainer::AscendingIterator::begin()
     {
         if (iterator_container.size() == 0)
@@ -121,23 +122,23 @@ namespace ariel
         return AscendingIterator(iterator_container, 0);
     }
 
+    // This function returns an instance of this iterator in the last index of the container 
     MagicalContainer::AscendingIterator MagicalContainer::AscendingIterator::end()
     {
         return AscendingIterator(iterator_container, iterator_container.size());
     }
     // ------------------------------------------------SideCrossIterator functions--------------------------------------------------
     // Constructors
+
+    // Default constructor
     MagicalContainer::SideCrossIterator::SideCrossIterator()
         : iterator_container(*(new MagicalContainer())), startIndex(0), endIndex(0), isFront(true) {}
 
     MagicalContainer::SideCrossIterator::SideCrossIterator(MagicalContainer &container)
-        : iterator_container(*(new MagicalContainer()))
+        : iterator_container(*(new MagicalContainer())), startIndex(0), endIndex(container.size()), isFront(true)
     {
-        iterator_container.elements_vector = container.elements_vector; // Assign pointer to original vector
-        startIndex = 0;
-        endIndex = 0;
-        isFront = true;
-        arrangeSideCross(iterator_container);
+        iterator_container.elements_vector = container.elements_vector; // Assign pointer to original vector of the container without changing it
+        arrangeSideCross(iterator_container); // Arrange the container in the proper order for this iterator
     }
 
     MagicalContainer::SideCrossIterator::SideCrossIterator(const SideCrossIterator &other)
@@ -177,24 +178,20 @@ namespace ariel
         int i = 0;
         while (startIndex < endIndex)
         {
-            // std ::cout << i << std::endl;
             i++;
             if (isFront)
             {
                 arrangedElements.push_back(container.elements_vector[startIndex]);
-                // std ::cout << container.elements_vector[startIndex] << std::endl;
                 startIndex++;
             }
             else
             {
                 arrangedElements.push_back(container.elements_vector[endIndex - 1]);
-                // std ::cout << container.elements_vector[endIndex -1] << std::endl;
                 endIndex--;
             }
 
             isFront = !isFront;
         }
-        // container.removeElement(container.elements_vector[endIndex -1]);
         //  Update the container's elements with the arranged order
         iterator_container.elements_vector = std::move(arrangedElements);
         this->startIndex = 0;
@@ -218,9 +215,10 @@ namespace ariel
     MagicalContainer::SideCrossIterator::SideCrossIterator(MagicalContainer &container, size_t startIndex, size_t endIndex, bool isFront)
         : iterator_container(container), startIndex(startIndex), endIndex(endIndex), isFront(isFront) {}
 
+    //The container of the iterator is already in the proper order 
     int MagicalContainer::SideCrossIterator::operator*() const
     {
-        return isFront ? iterator_container.elements_vector[startIndex] : iterator_container.elements_vector[endIndex];
+        return iterator_container.elements_vector[startIndex]; 
     }
 
     MagicalContainer::SideCrossIterator &MagicalContainer::SideCrossIterator::operator++()
@@ -269,15 +267,19 @@ namespace ariel
 
     // ------------------------------------------------PrimesIterator functions--------------------------------------------------
     // Constructors
+
+    // Default constructor
     MagicalContainer::PrimeIterator::PrimeIterator()
         : iterator_container(*(new MagicalContainer())), currentIndex(0) {}
 
     MagicalContainer::PrimeIterator::PrimeIterator(const MagicalContainer &container, size_t currentIndex)
         : iterator_container(container), currentIndex(currentIndex) {}
 
+    // Copy constructor
     MagicalContainer::PrimeIterator::PrimeIterator(const PrimeIterator &other)
         : iterator_container(other.iterator_container),
           currentIndex(other.currentIndex) {}
+
     // Implement the move constructor
     MagicalContainer::PrimeIterator::PrimeIterator(PrimeIterator &&other) noexcept
         : iterator_container(other.iterator_container),
@@ -287,7 +289,7 @@ namespace ariel
         other.currentIndex = 1000;
     }
 
-    // Implement the move assignment operator
+    // Move assignment operator
     MagicalContainer::PrimeIterator &MagicalContainer::PrimeIterator::operator=(PrimeIterator &&other) noexcept
     {
         if (this != &other)
@@ -312,6 +314,7 @@ namespace ariel
     MagicalContainer::PrimeIterator::PrimeIterator(const MagicalContainer &container)
         : iterator_container(container) // Initialize iterator_container with container
     {
+        //assigned the iterator to point on the first prime elemnt
         this->currentIndex = static_cast<size_t>(container.size());
         for (size_t i = 0; i < container.size(); i++)
         {
@@ -350,6 +353,7 @@ namespace ariel
             throw std::runtime_error("got to the end");
         }
         ++currentIndex;
+        // go over all the container until you get to the next prime number
         while (currentIndex <= iterator_container.size() - 1 && !isPrime(iterator_container.elements_vector[currentIndex]))
         {
             ++currentIndex;
