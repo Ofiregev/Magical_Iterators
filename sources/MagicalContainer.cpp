@@ -9,12 +9,13 @@ namespace ariel
 
     // Core functions - add, remove and size
     void MagicalContainer::addElement(int element)
-    {
-        // std::cout << "adding " << std::to_string(element) << std::endl;
-        elements_vector.push_back(element);
-        // Keep the container sort in ascending order
-        std::sort(elements_vector.begin(), elements_vector.end());
-    }
+{
+    // Find the position to insert the new element
+    auto it = std::lower_bound(elements_vector.begin(), elements_vector.end(), element);
+
+    // Insert the element at the found position
+    elements_vector.insert(it, element);
+}
 
     void MagicalContainer::removeElement(int element)
     {

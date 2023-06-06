@@ -23,7 +23,7 @@ namespace ariel
     class MagicalContainer::AscendingIterator
     {
     private:
-        MagicalContainer iterator_container;
+        MagicalContainer& iterator_container;
         size_t currentIndex;
 
     public:
