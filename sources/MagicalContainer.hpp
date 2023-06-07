@@ -8,12 +8,15 @@ namespace ariel
     {
     private:
         std::vector<int> elements_vector;
+        std::vector<int> primes_vector;
 
     public:
         MagicalContainer();
         void addElement(int element);
         void removeElement(int element);
         size_t size() const;
+        bool isPrime(int number) const;
+
     
         class AscendingIterator;
         class SideCrossIterator;
