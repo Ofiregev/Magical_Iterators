@@ -8,59 +8,29 @@ namespace ariel
     MagicalContainer::MagicalContainer() : elements_vector(std::vector<int>{}) {} // Default Constructor
 
     // Core functions - add, remove and size
-void MagicalContainer::addElement(int element)
-{
-    // Find the position to insert the new element
-    auto it = std::lower_bound(elements_vector.begin(), elements_vector.end(), element);
-
-    // Insert the element at the found position
-    it = elements_vector.insert(it, element);
-    std::cout << "add " << element << std::endl;
-
-    if (isPrime(element))
+    void MagicalContainer::addElement(int element)
     {
-        primes_vector.clear();
-        for (size_t i = 0; i < elements_vector.size(); ++i)
+        // Find the position to insert the new element
+        auto it = std::lower_bound(elements_vector.begin(), elements_vector.end(), element);
+
+        // Insert the element at the found position
+        it = elements_vector.insert(it, element);
+        std::cout << "add " << element << std::endl;
+
+        if (isPrime(element))
+        {
+            primes_vector.clear();
+            // Updating the indicies in the prime_vector according to the changes in the element_vector
+            for (size_t i = 0; i < elements_vector.size(); ++i)
             {
-                if (isPrime(elements_vector[i])){
-                primes_vector.push_back(i);
-                // std::cout << "current index " << i << std::endl;
-                // std::cout << "current value " << elements_vector[i] << std::endl;
-                //std::cout << "size of primes " << primes_vector.size() << std::endl;
+                if (isPrime(elements_vector[i]))
+                {
+                    primes_vector.push_back(i);
                 }
             }
-        
+        }
     }
-}
-
-
-        // if (isPrime(element))
-        // {
-        //     primes_vector.push_back(insertedElementIndex);
-        //     std::cout << "add " << element << std::endl;
-
-        // Update indices in primes_vector if needed
-        // for (size_t i = 0; i < primes_vector.size(); i++)
-        // {
-        //     // // Get the current index in primes_vector
-        //     // size_t currentIndex = static_cast<size_t>(primes_vector[i]);
-
-        //     // // Get the value from elements_vector using the index
-        //     // int currentValue = elements_vector[currentIndex];
-        //     // std::cout << "current index " << std::to_string(currentIndex) << std::endl;
-        //     // std::cout << "current value " << std::to_string(currentValue) << std::endl;
-
-        //     // // Update the index in primes_vector if it changed
-        //     // if (currentValue != *insertedElementIterator)
-        //     // {
-        //     //     primes_vector[i] = insertedElementIndex;
-        //     // }
-        //     // std::cout << "primes_vector[i] " << std::to_string(primes_vector[i]) << std::endl;
-
-        //     std::cout << elements_vector[static_cast<size_t>(primes_vector[i])] << std::endl;
-        // }
-    
-
+    // This function checking if the element is prime number
     bool MagicalContainer::isPrime(int number) const
     {
         if (number < 2)
@@ -192,11 +162,12 @@ void MagicalContainer::addElement(int element)
         : iterator_container(*(new MagicalContainer())), startIndex(0), endIndex(0), isFront(true) {}
 
     MagicalContainer::SideCrossIterator::SideCrossIterator(MagicalContainer &container)
-        : iterator_container(*(new MagicalContainer())), startIndex(0), endIndex(container.size()), isFront(true)
+        : iterator_container(container), startIndex(0), endIndex(container.size()), isFront(true)
     {
-        iterator_container.elements_vector = container.elements_vector; // Assign pointer to original vector of the container without changing it
-        arrangeSideCross(iterator_container);                           // Arrange the container in the proper order for this iterator
     }
+
+    MagicalContainer::SideCrossIterator::SideCrossIterator(MagicalContainer &container, size_t startIndex, size_t endIndex, bool isFront)
+        : iterator_container(container), startIndex(startIndex), endIndex(endIndex), isFront(isFront) {}
 
     MagicalContainer::SideCrossIterator::SideCrossIterator(const SideCrossIterator &other)
         : iterator_container(other.iterator_container),
@@ -215,46 +186,13 @@ void MagicalContainer::addElement(int element)
             endIndex = other.endIndex;
             isFront = other.isFront;
             // Set the other object's state to indicate it has been moved from
-            other.currentIndex = 1;
+            other.currentIndex = 1000;
         }
         return *this;
     }
 
     // Destructor
     MagicalContainer::SideCrossIterator::~SideCrossIterator() {}
-
-    // This function takes the container of the iterator and arrange it's element by the proper order
-    void MagicalContainer::SideCrossIterator::arrangeSideCross(MagicalContainer &container)
-    {
-        std::vector<int> arrangedElements;
-        size_t startIndex = 0;
-        size_t endIndex = container.size();
-
-        // Alternate between taking elements from the front and back
-        bool isFront = true;
-        int i = 0;
-        while (startIndex < endIndex)
-        {
-            i++;
-            if (isFront)
-            {
-                arrangedElements.push_back(container.elements_vector[startIndex]);
-                startIndex++;
-            }
-            else
-            {
-                arrangedElements.push_back(container.elements_vector[endIndex - 1]);
-                endIndex--;
-            }
-
-            isFront = !isFront;
-        }
-        //  Update the container's elements with the arranged order
-        iterator_container.elements_vector = std::move(arrangedElements);
-        this->startIndex = 0;
-        this->endIndex = container.size();
-        this->currentIndex = this->startIndex;
-    }
 
     MagicalContainer::SideCrossIterator &ariel::MagicalContainer::SideCrossIterator::operator=(const SideCrossIterator &other)
     {
@@ -269,22 +207,66 @@ void MagicalContainer::addElement(int element)
         return *this;
     }
 
-    MagicalContainer::SideCrossIterator::SideCrossIterator(MagicalContainer &container, size_t startIndex, size_t endIndex, bool isFront)
-        : iterator_container(container), startIndex(startIndex), endIndex(endIndex), isFront(isFront) {}
-
-    // The container of the iterator is already in the proper order
     int MagicalContainer::SideCrossIterator::operator*() const
     {
-        return iterator_container.elements_vector[startIndex];
+        // Check which index to return according to the "isFront" variable
+        if (isFront)
+        {
+            return iterator_container.elements_vector[startIndex];
+        }
+        else
+        {
+            if (endIndex != iterator_container.size())
+            {
+                return iterator_container.elements_vector[endIndex];
+            }
+            else
+            {
+                return iterator_container.elements_vector[endIndex - 1];
+            }
+        }
     }
 
     MagicalContainer::SideCrossIterator &MagicalContainer::SideCrossIterator::operator++()
     {
         if (*this == this->end())
         {
-            throw std::runtime_error("got to the end");
+            throw std::runtime_error("Reached the end");
         }
-        ++startIndex;
+        // The iterator moves is the side-cross way as needed - O(1), moving 1 step each time.
+        if (!isFront)
+        {
+            if (startIndex + 1 < endIndex)
+            {
+                ++startIndex;
+                isFront = !isFront;
+            }
+            else if (startIndex + 1 == endIndex)
+            {
+                ++startIndex;
+            }
+            else
+            {
+                isFront = false;
+            }
+        }
+        else
+        {
+            if (startIndex < endIndex - 1)
+            {
+                --endIndex;
+                isFront = !isFront;
+            }
+            else if (startIndex == endIndex - 1)
+            {
+                --endIndex;
+            }
+            else
+            {
+                isFront = true;
+            }
+        }
+
         return *this;
     }
 
@@ -314,12 +296,16 @@ void MagicalContainer::addElement(int element)
         {
             throw std::runtime_error("Container is empty!");
         }
+
         return SideCrossIterator(iterator_container, 0, iterator_container.size(), true);
     }
 
     MagicalContainer::SideCrossIterator MagicalContainer::SideCrossIterator::end()
     {
-        return SideCrossIterator(iterator_container, iterator_container.size(), iterator_container.size(), false);
+        // The iterator ends when it gets to the middle index of the vector
+        size_t middleIndex = iterator_container.size() / 2;
+        size_t endIndex = middleIndex;
+        return SideCrossIterator(iterator_container, middleIndex, endIndex, true);
     }
 
     // ------------------------------------------------PrimesIterator functions--------------------------------------------------
@@ -371,40 +357,14 @@ void MagicalContainer::addElement(int element)
     MagicalContainer::PrimeIterator::PrimeIterator(const MagicalContainer &container)
         : iterator_container(container), currentIndex(0) // Initialize iterator_container with container
     {
-        // assigned the iterator to point on the first prime elemnt
-        //  this->currentIndex = static_cast<size_t>(container.size());
-        //  for (size_t i = 0; i < container.size(); i++)
-        //  {
-        //      if (isPrime(iterator_container.elements_vector.at(i)))
-        //      {
-        //          currentIndex = static_cast<size_t>(i);
-        //          break;
-        //      }
-        //  }
     }
 
     // Destructor
     MagicalContainer::PrimeIterator::~PrimeIterator() {}
 
-    // bool MagicalContainer::PrimeIterator::isPrime(int number) const
-    // {
-    //     if (number < 2)
-    //         return false;
-    //     for (int i = 2; i <= std::sqrt(number); ++i)
-    //     {
-    //         if (number % i == 0)
-    //             return false;
-    //     }
-    //     return true;
-    // }
-
     int MagicalContainer::PrimeIterator::operator*() const
     {
-        // std::cout << "current " << std::to_string(currentIndex) << std::endl;
-        // std::cout << "size of primes " << std::to_string(iterator_container.primes_vector.size()) << std::endl;
-
-        size_t current =  static_cast<size_t>(iterator_container.primes_vector[currentIndex]);
-        //std::cout << "primes_vector[i] " << std::to_string(current) << std::endl;
+        size_t current = static_cast<size_t>(iterator_container.primes_vector[currentIndex]);
         return iterator_container.elements_vector[current];
     }
 
@@ -415,13 +375,6 @@ void MagicalContainer::addElement(int element)
             throw std::runtime_error("got to the end");
         }
         ++currentIndex;
-        //std::cout << "current index " << currentIndex << std::endl;
-
-        // go over all the container until you get to the next prime number
-        // while (currentIndex <= iterator_container.size() - 1 && !isPrime(iterator_container.elements_vector[currentIndex]))
-        // {
-        //     ++currentIndex;
-        // }
         return *this;
     }
 
@@ -451,16 +404,11 @@ void MagicalContainer::addElement(int element)
         {
             throw("cannot get in the container");
         }
-        // size_t currentIndex = 0;
-        // while (currentIndex < iterator_container.size() && !isPrime(iterator_container.elements_vector[currentIndex]))
-        //     ++currentIndex;
         return PrimeIterator(iterator_container, 0);
     }
 
     MagicalContainer::PrimeIterator MagicalContainer::PrimeIterator::end()
     {
-        //std::cout << "size of primes - end " << iterator_container.primes_vector.size() << std::endl;
-
         return PrimeIterator(iterator_container, iterator_container.primes_vector.size());
     }
 }
